@@ -1,0 +1,62 @@
+info:
+    app:
+        name: "@project.name@"
+        version: "@project.version@"
+spring:
+    application.name: "@project.name@"
+
+micros.rest.asap.authorized-issuers:
+  - "local-issuer"
+
+
+micros.metrics.tags.common:
+    - environment
+    - environment_type
+    - region
+
+axe:
+  emit-access-logs: false  # change this to have access logs
+
+## The following sections can be used to override values in specific environments.
+## Remember that any configuration value can be overwritten using Micros stash variables, therefore the mechanism
+## below is optional.
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+spring.devtools.restart.enabled: true
+error.include-stacktrace: on-trace-param
+# logging.config: "classpath:logback-local.xml"
+
+# These ASAP properties are provided by Keyserver/Micros-server as environment variables when running in Micros:
+micros.rest.asap:
+    issuer: "local-issuer"
+    key-id: "local-issuer/key1"
+    # the corresponding public key is available in the DEV bucket
+    private-key-data-uri:  "data:application/pkcs8;kid=local-issuer%2Fkey1;base64,MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCu+1uNUm/eoizbs9bmMvkbnOCtEgfIsRFHWGt2a++JGFHYzBrLJWUWyVLHuw0qJTfKWwo1HsIeZiTjQyV+untS9/8NY2r2P6Dcb4IBOEV65GHll4tVSvMC7Xc07Vh131KsmtRcW/2lstaxHrCt9bzqrGrK8M/82ENN+DN0cun64qEFMbKEURy8lxQJa84hUYWbwy7kcqNlED0U9/rbJAWUqy/jwnBc11Hdp11HTUJlMTEY89uvyO7oU7QjHe6vbScDgDUmQSod6ZbmVoD1+Qs+O28gLwlrKRGGdwxXOC+9tG9rmxc49ewaEY7x7Jql6W771rObafUOQ/d4Z0iK9JAxAgMBAAECggEAP1AhqzvV0Id7la83palx6yTTQqwQdvRinR8IGxwo2sEa9Ee9th18u0bzFeO/eq1mx2gzhE7xzBAHbtef3H/bGYU0GwMK87jIGpqaPpi+wx2Zsnon5x+sWDXV+Seb52J7xoprJlP+rhLMjd/d68PLrFngdje1+fXCPJb+/zaJJMZ7nijcPt9AkEper6EgrD1ud3Rgq+3TyVZhg+UNTBWg4FYCZRHwAfuYsgwborU5/7G9vXDClVcyvm2WgvjLcPkWojSW7W8koLCxKNnCRNlLzrO/ZWc+qU+G0jziBYFA8zopKqXZF/hnIEQEVDbQFixNqlOaX6uiLBwXKieoM4m/pQKBgQDq/rFiJRh996bziF/BOXY9SZirsx0mKfMEzK4Q6Qis6GNSgPK9S8G3PKw/xmPS82FRHeJlSIqRWYVP4u7CDxJ8A6BiODTMBnno5ScCuqYZzAyOgExh3J6HcDPaxr7/2VpBU3SZiTIY+6STYoYOU1b/pLSFVCRUOR5w5cdF4UdxFwKBgQC+n2hEdNFwuvPflA94Kx+1kIYqyy3UH89RtteQImAgaqeM8iSjxR5teVdK/PTqFdh+/Vc5eI00vjp6vji2nA0+tv1cFv7ynxpqlwrcnNCAahSOacUjYNRyH3ayiYSX4eaCjTrzpKEPr8oGYsT0MFLZf8bUioIIQkGtlgRPXVcF9wKBgD4aoXZ2p0pjMNQbrnK6ZO09jgOSipmTbI5QKZB+hbRslhMv0PcGFmP+vOb931PYzldJtpNd4IEZT4oVR1Qx94iezLwoboudCorqRK0L9unKa2cdsRIL5DmXBZ1D+SZUou2wyJfrEjpYBt6MozEWBV/6f1rdKdy4W7sqfseRCfhxAoGADNyopmXTc+3JYr6UxKD0RMX5p42KDBQRYwwZQ2puXgGUSJhWDI7SXMShNTgYNms+7mKdrg0KShLD02BeZ0PkSOUD92C91xURLTv/yZ7zGpcNyAYu/RIdg43H7ogE4FKnwQtSfPoQvAQ6d2/WpjtUe8R5YAHwgCooUFQc+lXr90UCgYEAqLumlzcX+Sk7UkIYs/k1w64YXHHLIejODYeokTNsQyWm0lVRopv17HRSHlzv3lGwfs2ug5kfYrUsaq6YcfFC/GfErsGPoat0ib6D0n+Jkfj0qYZE61hcaeH6IPHo0caR5x9/wz+rrpomzDj/xY9oo54ZRcuyd3UhOBtXk22db3E="
+    audience: "democrud-bookapplication"
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: stg
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
