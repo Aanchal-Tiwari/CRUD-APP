@@ -1,0 +1,41 @@
+#!/bin/bash
+
+function run() { (set -x ; "$@") }
+
+initial_status=$(git status --porcelain --untracked=no)
+if [[ $initial_status != "" ]]; then
+  run git stash save && STASHED=1
+fi
+
+find gradle/ -type f | xargs -I{} bash -x -c "git rm {}"
+
+run chmod 755 bin/*
+
+# Clean up any empty directories leftover from file renames or deletes
+run find . -type d -empty -delete
+
+if [ "${bamboo_capability_system_jdk_JDK_11:-}" == "" ]; then
+  NPM=`which npm`
+
+  if [ "$NPM" != "" ]; then
+    echo "Creating DAC document set starting point"
+    npm install -g @atlassian/create-atlassian-docs
+    create-atlassian-docs init developer.atlassian.com
+  else
+    echo "NPM not found, to create a DAC document set starting point,  install NPM and then run 'npm install -g @atlassian/create-atlassian-docs && create-atlassian-docs init developer.atlassian.com'"
+  fi
+
+  echo "See https://developer.atlassian.com/platform/writing-toolkit/getting-started/ for more information on getting started with DAC documentation"
+fi
+
+
+run git add .
+run git commit -a -m "bin/first-run tweaks to the environment
+
+* cleaned up left-over gradle noise
+* delete left-over freemarker macros file
+"
+
+if [[ $STASHED == 1 ]]; then
+  run git stash pop
+fi
