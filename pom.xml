@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.atlassian.micros.contrib</groupId>
+        <artifactId>micros-spring-boot-parent</artifactId>
+        <version>4.5.6</version>
+    </parent>
+
+    <name>DemoCRUD BookApplication</name>
+    <description>crud app</description>
+    <groupId>io.atlassian.micros.instant</groupId>
+    <artifactId>democrud-bookapplication</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <java.version>11</java.version>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>${maven.compiler.target}</maven.compiler.source>
+        <maven.compiler.release>${maven.compiler.target}</maven.compiler.release>
+        <junit.jupiter.version>5.8.2</junit.jupiter.version>
+        <docker.registry>docker.atl-paas.net</docker.registry>
+        <docker.namespace>atlassian</docker.namespace>
+        <docker.tag.suffix>-${user.name}</docker.tag.suffix>
+        <build.timestamp>${maven.build.timestamp}</build.timestamp>  <!-- used to build Bamboo release numbers -->
+        <maven.build.timestamp.format>yyyy-MM-dd_HH-mm</maven.build.timestamp.format>
+        <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
+
+    </properties>
+
+    <dependencies>
+
+
+        <dependency>
+            <groupId>io.atlassian.micros.contrib</groupId>
+            <artifactId>micros-spring-boot-starter-base</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.atlassian.micros.contrib</groupId>
+            <artifactId>micros-spring-boot-starter-rest-spring-mvc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-dynamodb</artifactId>
+            <version>1.12.154</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <version>2.6.3</version>
+        </dependency>
+
+        <!-- Test -->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>2.6.3</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-dynamodb</artifactId>
+            <version>1.12.154</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.22</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${org.mapstruct.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <version>3.8.1</version>
+                            <configuration>
+                                <source>1.8</source>
+                                <target>1.8</target>
+                                <annotationProcessorPaths>
+                                    <path>
+                                        <groupId>org.mapstruct</groupId>
+                                        <artifactId>mapstruct-processor</artifactId>
+                                        <version>${org.mapstruct.version}</version>
+                                    </path>
+                                </annotationProcessorPaths>
+                            </configuration>
+                        </plugin>
+
+                <plugin>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>0.39.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.0.0-M3</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.8.7</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>io.atlassian.micros.myservice.Application</mainClass>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>write-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <outputFile>
+                                ${project.build.directory}/release-version.properties
+                            </outputFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>io.github.git-commit-id</groupId>
+                <artifactId>git-commit-id-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>   <!-- no need to upload Maven artifacts, just Docker images -->
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>docker-build</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>docker-push</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>push</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <useColor>true</useColor>
+                    <verbose>true</verbose>
+                    <autoPull>always</autoPull>
+                    <images>
+                        <image>
+                            <name>${docker.registry}/${docker.namespace}/${project.artifactId}:${git.commit.id}${docker.tag.suffix}</name>
+                            <build>
+                                <args>
+                                    <buildNumber>${build.timestamp}</buildNumber>
+                                </args>
+                                <dockerFileDir>${project.basedir}</dockerFileDir>
+                            </build>
+                            <!-- Allow docker:run and docker:start to work by providing the MEMORY_OPTS env variable that micros-java-* images require -->
+                            <run>
+                                <env>
+                                    <MEMORY_OPTS>-Xmx512M</MEMORY_OPTS> <!--  25% of system memory for a t2.small / default instance size -->
+                                </env>
+                            </run>
+                        </image>
+                    </images>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <executions>
+                <execution>
+                    <id>config-dump</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>exec</goal>
+                    </goals>
+                    <configuration>
+                        <commandlineArgs>run --rm ${docker.registry}/${docker.namespace}/${project.artifactId}:${git.commit.id}${docker.tag.suffix} inspect config</commandlineArgs>
+                        <executable>docker</executable>
+                    </configuration>
+                </execution>
+                <execution>
+                    <id>generate-nebulae</id>
+                    <goals>
+                        <goal>exec</goal>
+                    </goals>
+                    <phase>pre-integration-test</phase>
+                    <configuration>
+                        <executable>atlas</executable>
+                        <arguments>
+                            <argument>nebulae</argument>
+                            <argument>sandbox</argument>
+                            <argument>generate</argument>
+                            <!-- additional arguments here -->
+                        </arguments>
+                    </configuration>
+                </execution>
+                <execution>
+                    <id>start-nebulae</id>
+                    <goals>
+                        <goal>exec</goal>
+                    </goals>
+                    <phase>pre-integration-test</phase>
+                    <configuration>
+                        <executable>atlas</executable>
+                        <arguments>
+                            <argument>nebulae</argument>
+                            <argument>sandbox</argument>
+                            <argument>start</argument>
+                            <argument>--export-env=./envs.json</argument>
+                            <!-- additional arguments here -->
+                        </arguments>
+                    </configuration>
+                </execution>
+                <execution>
+                    <id>stop-nebulae</id>
+                    <goals>
+                        <goal>exec</goal>
+                    </goals>
+                    <phase>post-integration-test</phase>
+                    <configuration>
+                        <executable>atlas</executable>
+                        <arguments>
+                            <argument>nebulae</argument>
+                            <argument>sandbox</argument>
+                            <argument>stop</argument>
+                            <!-- additional arguments here -->
+                        </arguments>
+                    </configuration>
+                </execution>
+                </executions>
+            </plugin>
+
+
+
+
+
+            <plugin>
+                <groupId>com.atlassian.maven.plugins</groupId>
+                <artifactId>revealer-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>verify</id>
+                        <phase>verify</phase>
+                        <configuration>
+                            <jdepsVersion>${java.version}</jdepsVersion>
+                        </configuration>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+
+            <plugin>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-logging-framework</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <excludes>
+                                        <exclude>commons-logging:commons-logging</exclude>
+                                        <exclude>org.slf4j:slf4j-log4j12</exclude>
+                                        <exclude>org.slf4j:slf4j-jcl</exclude>
+                                        <exclude>log4j:*</exclude>
+                                        <exclude>org.apache.logging.log4j:log4j-slf4j-impl</exclude>
+                                    </excludes>
+                                    <message>
+                                        Logback is the currently configured logging backend for this project.
+
+                                        This means:
+                                          * Logback is the backend implementation used for slf4j
+                                          * Other logging frameworks such as log4j1.x, log4j2.x, commons-logging and JCL are banned
+                                          * If a dependency compiles against a backend instead of slf4j, use a bridging legacy API
+                                            module instead. For more information on the right bridging API to use,
+                                            see https://www.slf4j.org/legacy.html.
+                                    </message>
+                                </bannedDependencies>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>enforce-junit-version</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <excludes>
+                                        <exclude>junit:junit</exclude>
+                                    </excludes>
+                                    <message>JUnit 4 not allowed</message>
+                                </bannedDependencies>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.0.0-M5</version>
+                <executions>
+                    <execution>
+                        <id>integration-test</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${maven.test.it.skip}</skip>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>sox</id>
+            <properties>
+                <docker.namespace>sox</docker.namespace>
+                <docker.tag.suffix></docker.tag.suffix>
+                <spring.exclude.devtools>true</spring.exclude.devtools>
+            </properties>
+        </profile>
+        <profile>
+            <id>pipelines</id>
+            <properties>
+                <docker.tag.suffix></docker.tag.suffix>
+                <spring.exclude.devtools>true</spring.exclude.devtools>
+            </properties>
+        </profile>
+    </profiles>
+
+</project>

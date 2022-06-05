@@ -1,0 +1,8 @@
+service:
+  name: democrud-bookapplication
+  descriptor:
+    path: target/classes/democrud-bookapplication.sd.yml
+    build:
+      commands:
+        # if running in Pipelines/Bamboo build using the pipelines profile
+        - (if [ -z "${CI+x}" ] && [ -z "${bamboo_planKey+x}" ]; then mvn package -Dmaven.test.skip -T 1C; else mvn package -Dmaven.test.skip -T 1C -Ppipelines; fi)
