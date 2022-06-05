@@ -1,0 +1,76 @@
+# The variables are extracted from the POM file
+requiresAsap: true
+name: "DemoCRUD BookApplication"
+description: "crud app"
+organization: "Commerce - CTO - CCP"
+network:
+  ingress: internal
+links:
+  healthcheck:
+    uri: /heartbeat
+    port: 8080
+notifications:
+  email: "atiwari6@atlassian.com"
+buildNumber: "2022-03-07_21-57"
+
+# NOTE: You will need to update this to match your service as you build it out
+computeClassification:
+  dataType:
+    - None
+
+compose:
+  democrud-bookapplication:
+    image: docker.atl-paas.net/atlassian/democrud-bookapplication
+    tag: "@git.commit.id@-atiwari6"
+    ports:
+      - 8080:8080
+      - 9010:9010
+
+scaling:
+  instance: t3.small # Change this to a different instance if required, go/instance-types
+
+
+config:
+  environmentVariables:
+    # See https://aws.amazon.com/ec2/instance-types/ for actual memory available for each instance type
+    MEMORY_OPTS: "-XX:MaxRAMPercentage=25.0" # 25% of system memory
+
+# See https://bitbucket.org/atlassian/ps-docker-base/src/master/ for information on how to:
+# - Enable JMX metrics collection
+# - Enable file crash dump and error log uploading to S3
+# - Flamegraph support
+# - New relic support
+resources:
+  - type: dynamo-db
+    name: book
+    attributes:
+      dataType:
+        - None
+      ReadWriteCapacityMode: ON_DEMAND
+      HashKeyName: bookId
+      HashKeyType: S
+
+environmentOverrides:
+  staging:
+    resources:
+      #Enable chaos engineering by default in staging environments
+      - type: faila
+        name: approx-one-termination-in-24-hours
+        attributes:
+          type: termination
+          schedule: "0 0 * * * ?"
+          probability: 4
+
+
+  local:
+    compose:
+      democrud-bookapplication:
+        image: docker.atl-paas.net/atlassian/democrud-bookapplication
+        tag: "@git.commit.id@-atiwari6"
+        ports:
+          - 8080:8080
+          - 9010:9010
+    
+    config:
+      environmentVariables:
+        MEMORY_OPTS: "-Xmx512M"
