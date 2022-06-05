@@ -1,0 +1,13 @@
+io/atlassian/micros/myservice/exception/BookNotFoundException.class
+io/atlassian/micros/myservice/Application.class
+io/atlassian/micros/myservice/entity/BookMapper.class
+io/atlassian/micros/myservice/config/DynamoDbConfiguration.class
+io/atlassian/micros/myservice/service/BookService.class
+io/atlassian/micros/myservice/WebServiceController.class
+io/atlassian/micros/myservice/repository/BookRepository.class
+io/atlassian/micros/myservice/entity/BookRequest.class
+io/atlassian/micros/myservice/controller/BookDataController.class
+io/atlassian/micros/myservice/entity/BookMapperImpl.class
+io/atlassian/micros/myservice/entity/BookResponse.class
+io/atlassian/micros/myservice/entity/BookData.class
+io/atlassian/micros/myservice/WebServiceController$SampleResponse.class

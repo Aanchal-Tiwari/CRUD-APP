@@ -1,0 +1,11 @@
+/Users/atiwari6/Desktop/democrud-bookapplication/src/main/java/io/atlassian/micros/myservice/config/DynamoDbConfiguration.java
+/Users/atiwari6/Desktop/democrud-bookapplication/src/main/java/io/atlassian/micros/myservice/controller/BookDataController.java
+/Users/atiwari6/Desktop/democrud-bookapplication/src/main/java/io/atlassian/micros/myservice/entity/BookRequest.java
+/Users/atiwari6/Desktop/democrud-bookapplication/src/main/java/io/atlassian/micros/myservice/entity/BookResponse.java
+/Users/atiwari6/Desktop/democrud-bookapplication/src/main/java/io/atlassian/micros/myservice/entity/BookData.java
+/Users/atiwari6/Desktop/democrud-bookapplication/src/main/java/io/atlassian/micros/myservice/Application.java
+/Users/atiwari6/Desktop/democrud-bookapplication/src/main/java/io/atlassian/micros/myservice/WebServiceController.java
+/Users/atiwari6/Desktop/democrud-bookapplication/src/main/java/io/atlassian/micros/myservice/repository/BookRepository.java
+/Users/atiwari6/Desktop/democrud-bookapplication/src/main/java/io/atlassian/micros/myservice/entity/BookMapper.java
+/Users/atiwari6/Desktop/democrud-bookapplication/src/main/java/io/atlassian/micros/myservice/service/BookService.java
+/Users/atiwari6/Desktop/democrud-bookapplication/src/main/java/io/atlassian/micros/myservice/exception/BookNotFoundException.java
