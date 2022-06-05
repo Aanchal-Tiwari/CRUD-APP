@@ -24,14 +24,14 @@ public class DynamoDbConfiguration
                 .withEndpointConfiguration(
                         new AwsClientBuilder.EndpointConfiguration(
                                 "dynamodb.us-east-1.amazonaws.com",
-                                "us-east-1"
+                                "region"
                         )
                 )
                 .withCredentials(
                         new AWSStaticCredentialsProvider(
                                 new BasicAWSCredentials(
-                                        "AKIAWN3LHTCHGYH7YBGR",
-                                        "AHjAdzixwd7eJ9745aZ/MuHlbUOLdLZ33xy64D1s"
+                                        "aws_secret_key",
+                                        "aws_access_key"
                                 )
                         )
                 )
